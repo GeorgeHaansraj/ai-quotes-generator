@@ -9,7 +9,7 @@ export default function Home() {
         Generate Quote
       </button>
       <div className="text-center text-xl max-w-xl">
-        “Believe you can and you're halfway there.”
+        “Believe you can and you are halfway there.”
       </div>
     </main>
   );
