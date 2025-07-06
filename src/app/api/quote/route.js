@@ -24,7 +24,7 @@ export async function POST() {
 */
 
 // Ini route.js untuk HuggingFace
-export async function POST() {
+/*export async function POST() {
   const huggingfaceToken = process.env.HUGGINGFACE_TOKEN_AI;
 
   console.log("ENV HUGGINGFACE_TOKEN_AI:", huggingfaceToken);
@@ -60,4 +60,42 @@ export async function POST() {
   }
 
   return Response.json({ quote });
+}
+*/
+
+// Ini route.js untuk Gemini
+export async function POST(request) {
+  try {
+    const body = await request.json();
+    const prompt = body.prompt || "Give me a motivational quote.";
+
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${process.env.GEMINI_API_KEY}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [{ text: prompt }]
+          }
+        ],
+        generationConfig: {
+          temperature: 0.9,
+          topK: 40,
+          topP: 0.95
+        }
+      })
+    });
+
+    const data = await res.json();
+    console.log("API Response:", data);
+
+    const quote = data?.candidates?.[0]?.content?.parts?.[0]?.text;
+    return Response.json({ quote: quote || "Gagal mendapatkan kutipan dari Gemini." });
+
+  } catch (error) {
+    console.error("Gemini API Error:", error);
+    return Response.json({ quote: "Gagal mengambil kutipan dari Gemini." }, { status: 500 });
+  }
 }
